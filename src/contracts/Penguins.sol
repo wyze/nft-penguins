@@ -3,18 +3,21 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import {Base64} from "./libraries/Base64.sol";
 
-contract Penguins is ERC721URIStorage, Ownable {
+contract Penguins is ERC721Enumerable, ReentrancyGuard, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
 
     uint256 public immutable maxTotalSupply;
+    uint256 public immutable maxPerAddress = 2;
+    uint256 public immutable mintPrice = 0.0025 ether;
 
     string baseSvg =
         "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='black' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
@@ -51,12 +54,8 @@ contract Penguins is ERC721URIStorage, Ownable {
 
     event Minted(address indexed sender, uint256 tokenId);
 
-    constructor(uint256 _maxTotalSupply) ERC721("WyzeNFT", "WYZE") {
+    constructor(uint256 _maxTotalSupply) ERC721("Wyze Penguins", "WPNGN") {
         maxTotalSupply = _maxTotalSupply;
-    }
-
-    function getTokenCount() public view returns (uint256) {
-        return _tokenIds.current();
     }
 
     function random(string memory input) internal pure returns (uint256) {
@@ -93,14 +92,31 @@ contract Penguins is ERC721URIStorage, Ownable {
         return thirdWords[rand];
     }
 
-    function makeAnEpicNFT() public {
-        uint256 newItemId = _tokenIds.current();
+    function mint() public payable virtual nonReentrant {
+        uint256 nextId = _tokenIds.current();
 
-        require(newItemId < maxTotalSupply, "Max tokens have been minted.");
+        require(msg.value == mintPrice, "Price to mint is incorrect.");
+        require(
+            balanceOf(_msgSender()) < maxPerAddress,
+            "You've minted the max per wallet."
+        );
+        require(nextId < maxTotalSupply, "Max tokens have been minted.");
 
-        string memory first = firstWord(newItemId);
-        string memory second = secondWord(newItemId);
-        string memory third = thirdWord(newItemId);
+        _safeMint(msg.sender, nextId);
+        _tokenIds.increment();
+
+        emit Minted(msg.sender, nextId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        string memory first = firstWord(tokenId);
+        string memory second = secondWord(tokenId);
+        string memory third = thirdWord(tokenId);
         string memory combined = string(abi.encodePacked(first, second, third));
 
         string memory finalSvg = string(
@@ -127,14 +143,6 @@ contract Penguins is ERC721URIStorage, Ownable {
             )
         );
 
-        string memory finalTokenUri = string(
-            abi.encodePacked("data:application/json;base64,", json)
-        );
-
-        _safeMint(msg.sender, newItemId);
-        _setTokenURI(newItemId, finalTokenUri);
-        _tokenIds.increment();
-
-        emit Minted(msg.sender, newItemId);
+        return string(abi.encodePacked("data:application/json;base64,", json));
     }
 }
