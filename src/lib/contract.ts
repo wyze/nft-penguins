@@ -4,7 +4,7 @@ import PenguinsContract from '../../artifacts/src/contracts/Penguins.sol/Penguin
 
 import { ethers } from 'ethers'
 
-export const address = '0x4AD14f72305AE95204E1b085CC1aBb8aaa1ea881'
+export const address = '0x73e9ea250549d1646DE2295CE779b2Cf97Bc4ace'
 
 export function getContract() {
   const provider = new ethers.providers.Web3Provider(window.ethereum)
