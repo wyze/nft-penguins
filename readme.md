@@ -23,6 +23,7 @@ The deployment script for the contract will automatically update the frontend co
 
 ```sh
 $ yarn contract:deploy
+$ yarn contract:verify
 ```
 
 ### Frontend

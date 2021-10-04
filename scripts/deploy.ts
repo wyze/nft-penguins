@@ -9,13 +9,23 @@ async function main() {
   const Contract = await ethers.getContractFactory('Penguins')
   const contract = await Contract.deploy(256)
 
-  // Write contract address into the front end project
-  const file = './src/lib/contract.ts'
-  const contents = await readFile(file, 'utf8')
-
   console.log('Contract deployed:', contract.address)
 
-  await writeFile(file, contents.replace(/0x[^']+/, contract.address))
+  // Write contract address into the front end project
+  {
+    const file = './src/lib/contract.ts'
+    const contents = await readFile(file, 'utf8')
+
+    await writeFile(file, contents.replace(/0x[^']+/, contract.address))
+  }
+
+  // Write contract address into package.json to verify contract
+  {
+    const file = './package.json'
+    const contents = await readFile(file, 'utf8')
+
+    await writeFile(file, contents.replace(/0x[^\s]+/, contract.address))
+  }
 }
 
 main()

@@ -1,3 +1,4 @@
+import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
 
@@ -11,12 +12,15 @@ const ciConfig: HardhatUserConfig | undefined = process.env.CI
       paths: {
         sources: './src/contracts',
       },
-      solidity: '0.8.7',
+      solidity: '0.8.9',
     }
   : undefined
 
 const config: HardhatUserConfig = ciConfig ?? {
   defaultNetwork: process.env.NODE_ENV === 'test' ? 'hardhat' : 'rinkeby',
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
   networks: {
     rinkeby: {
       accounts: process.env.RINKEBY_ACCOUNTS?.split(','),
@@ -26,7 +30,15 @@ const config: HardhatUserConfig = ciConfig ?? {
   paths: {
     sources: './src/contracts',
   },
-  solidity: '0.8.7',
+  solidity: {
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+    version: '0.8.9',
+  },
 }
 
 export default config
