@@ -14,14 +14,6 @@ export default function Home() {
 
   const queryClient = useQueryClient()
   const { account, status } = useAccount()
-  const request = useMutation(
-    () => window.ethereum.request({ method: 'eth_requestAccounts' }),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
 
   const balanceOfWallet = useQuery(
     ['balance-of-wallet', account],
@@ -189,15 +181,7 @@ export default function Home() {
               </Flex>
             ) : null}
           </Flex>
-        ) : (
-          <Button
-            colorScheme="orange"
-            isLoading={request.status === 'loading'}
-            onClick={() => request.mutate()}
-          >
-            Connect Wallet
-          </Button>
-        )}
+        ) : null}
       </Center>
     </SimpleGrid>
   )
