@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 
 import NextLink from 'next/link'
+import Wallet from './Wallet'
 
 type LayoutProps = {
   children: React.ReactNode
@@ -70,9 +71,11 @@ export default function Layout({ children }: LayoutProps) {
       <Container
         centerContent
         justifyContent="center"
-        mt="10ch"
+        mt="3ch"
         maxW="container.xl"
       >
+        <Wallet />
+        <Box mb="6ch" />
         {children}
       </Container>
     </Flex>
