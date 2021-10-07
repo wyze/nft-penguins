@@ -77,13 +77,6 @@ export default function Home() {
     }
   )
 
-  // const change = useMutation(() =>
-  //   window.ethereum.request({
-  //     method: 'wallet_switchEthereumChain',
-  //     params: [{ chainId: `0x4` }],
-  //   })
-  // )
-
   useEffect(() => {
     if (window.ethereum) {
       const invalidateChain = () => {
