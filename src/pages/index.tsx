@@ -77,6 +77,13 @@ export default function Home() {
     }
   )
 
+  // const change = useMutation(() =>
+  //   window.ethereum.request({
+  //     method: 'wallet_switchEthereumChain',
+  //     params: [{ chainId: `0x4` }],
+  //   })
+  // )
+
   useEffect(() => {
     if (window.ethereum) {
       const invalidateChain = () => {
@@ -92,13 +99,15 @@ export default function Home() {
   }, [queryClient])
 
   useEffect(() => {
-    getContract().on('Minted', (_, tokenId) => {
-      setTokenId(tokenId.toNumber())
-      queryClient.invalidateQueries([
-        'current-tokens',
-        ['balance-of-wallet', account],
-      ])
-    })
+    if (window.ethereum) {
+      getContract().on('Minted', (_, tokenId) => {
+        setTokenId(tokenId.toNumber())
+        queryClient.invalidateQueries([
+          'current-tokens',
+          ['balance-of-wallet', account],
+        ])
+      })
+    }
   }, [account, queryClient])
 
   return (
